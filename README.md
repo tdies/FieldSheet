@@ -28,6 +28,6 @@ Compressed AHU-34 = QR version 23 (109 modules). Print at ≥ 0.5 mm/module → 
 
 ## Tag format
 `<base>#<payload>`. Payload prefix `z` = zlib + base64url of minified JSON; `j` = plain JSON.
-Record: `v, unit, typ, job, sh[], rev, asb, ctl[{tag, mdl, role, di, mac, net, ip, exp}], pts[[controller, channel, name, type, cable, wires, field device?, note?]]`.
-Wires: one row per conductor `[controller screw, lands at, color, role]`; role is `sig`, `ret`, `pwr` (loop power), `feed` (supply into a dry contact), `sw` (switched leg out to load), or `net`. `DO` points render a dry-contact callout automatically.
-Types: TH, mA, V, DI, DO, RNET, PWR.
+Record: `v, unit, typ, job, sh[], rev, asb, ctl[{tag, mdl, role, di, mac, net, ip, exp}], pts[[controller, channel, name, type, cable, lands[], field device?, note?]]`.
+`lands[]` lists where each conductor terminates, in the order of the type's wiring template. Templates (screw labels, roles, callouts, diagram — no wire colors, since field colors vary) live in the app (`TPL` in index.html), not in the tag.
+Types: TH, VI (V input), mA, DI, VO (V output), DO (UO in relay mode: feed/switched), DON (relay NO), RNET, PWR.

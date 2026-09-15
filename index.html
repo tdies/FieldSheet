@@ -71,19 +71,21 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 .pt .n small{display:block;color:var(--ink2);font-size:12px;margin-top:2px}
 .pt .r{text-align:right;font-size:12.5px;line-height:1.3}
 .pt .r b{display:block;font-size:14px}
-.pt{grid-template-columns:54px 1fr;align-items:start}
-.pt .n{padding-top:3px}
-.cond{grid-column:1/-1;margin-top:6px;border-top:1px dashed var(--rule);padding-top:6px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;font-size:13px;align-items:center}
-.cond .sc{font-weight:700;background:var(--strip);border:1px solid var(--rule);border-radius:3px;padding:2px 6px;white-space:nowrap}
-.cond .ld{white-space:nowrap}.cond .ld b{font-weight:600}
-.cond .ld small{color:var(--ink2);font-size:11.5px;display:block}
-.w{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;justify-self:end}
-.w i{width:16px;height:9px;border-radius:2px;border:1px solid #8892a0;display:inline-block}
-.w.RED i{background:#C8202A;border-color:#C8202A}.w.BLK i{background:#1B1B1B;border-color:#1B1B1B}.w.WHT i{background:#fff}.w.YEL i{background:#E8C21E;border-color:#E8C21E}.w.GRN i{background:#1E8A3B;border-color:#1E8A3B}.w.BLU i{background:#2456B8;border-color:#2456B8}.w.ORG i{background:#E8791E;border-color:#E8791E}.w.BRN i{background:#6B3E1E;border-color:#6B3E1E}
-.dry{grid-column:1/-1;font-size:12.5px;background:#FFF2B3;border-left:3px solid #C99A00;padding:6px 9px;border-radius:0 6px 6px 0;margin-top:4px;line-height:1.35}
+.pt{cursor:pointer}
+.pt .r{text-align:right;font-size:12.5px;line-height:1.3;color:var(--ink2);max-width:120px}.pt .r b{display:block;font-size:14px;color:var(--ink)}
+.sheet{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex}
+.sheet .pn{background:#fff;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 20px)}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--rule);margin:0 auto 12px}
+.sheet h3{margin:0;font-size:20px}.sheet .sub{color:var(--ink2);font-size:13px;margin:2px 0 10px}
+.sheet svg{width:100%;height:auto;display:block;margin:6px 0 10px}
+.wl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:14px;align-items:center;margin-bottom:10px}
+.wl .sc{font-weight:700;background:var(--strip);border:1px solid var(--rule);border-radius:3px;padding:2px 7px;white-space:nowrap}
+.wl .ld b{font-weight:600}.wl .ld small{display:block;color:var(--ink2);font-size:12px}
+.dry{font-size:13.5px;background:#FFF2B3;border-left:3px solid #C99A00;padding:8px 10px;border-radius:0 6px 6px 0;line-height:1.4;margin-bottom:10px}
 .dry>b:first-child{display:block;margin-bottom:2px}
-.note{grid-column:1/-1;font-size:12.5px;color:var(--ink2);margin-top:4px}
-.arrow{color:var(--ink2);font-size:12px}
+.tip{font-size:13.5px;color:var(--ink2);line-height:1.4;margin-bottom:8px}
+.close{display:block;width:100%;padding:12px;border:1.5px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink);font-size:15px;margin-top:6px}
 .hit{background:var(--hi)!important;box-shadow:inset 0 0 0 2px var(--yel)}
 .dim{opacity:.25}
 .foot{margin-top:28px;font-size:12px;color:var(--ink2);text-align:center}
@@ -95,17 +97,29 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 
 <div class="wrap" id="app"></div>
 
+<div class="sheet" id="sheet"><div class="pn" id="pn"></div></div>
 <div class="scan" id="scan"><video id="vid" playsinline muted></video><div class="reticle"></div>
 <div class="bar"><span id="scanmsg">Point at a tag</span><button id="stop">Cancel</button></div></div>
 
 <script src="jsqr.js"></script>
 <script>
 // ---------- sample tag (AHU-34, sheet 1.11) ----------
-const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101",[["UI-01 +","T3","WHT","sig"],["UI-01 \u2212","T4","RED","ret"]]],["ALC-35","UI-02","Space Pressure","mA","C-102",[["24Vdc +","T6","RED","pwr"],["UI-02 +","T5","WHT","sig"]]],["ALC-35","UI-05","Supply Air Temp","TH","C-105",[["UI-05 +","T11","WHT","sig"],["UI-05 \u2212","T12","BLK","ret"]]],["ALC-35","UI-06","Return Air Temp","TH","C-106",[["UI-06 +","T13","WHT","sig"],["UI-06 \u2212","T14","BLK","ret"]]],["ALC-35","UI-07","Return Air Hum","mA","C-107",[["24Vdc +","T16","RED","pwr"],["UI-07 +","T15","WHT","sig"]]],["ALC-35","UI-09","Mixed Air Temp","TH","C-109",[["UI-09 +","T19","WHT","sig"],["UI-09 \u2212","T20","BLK","ret"]]],["ALC-35","UI-11","Filters Diff Pressure","V","C-111",[["UI-11 +","T23","WHT","sig"],["UI-11 \u2212","T24","BLK","ret"]]],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112",[["UI-12 +","T25","WHT","sig"],["UI-12 \u2212","T26","BLK","ret"]]],["ALC-35","UO-01","CHW Valve","V","C-121",[["UO-01 +","T29","WHT","sig"],["UO-01 \u2212","T30","BLK","ret"]]],["ALC-35","UO-02","Gas Valve Enable","DO","C-122",[["UO-02 +","T27 (24V)","WHT","feed"],["UO-02 \u2212","CR-34 coil","BLK","sw"]]],["ALC-35","UO-03","Gas Valve Signal","V","C-123",[["UO-03 +","T33","WHT","sig"],["UO-03 \u2212","T34","BLK","ret"]]],["ALC-35","UO-04","Economizer Dampers","V","C-124",[["UO-04 +","T35","WHT","sig"],["UO-04 \u2212","T36","BLK","ret"]]],["ALC-35","UO-05","Exhaust Air Damper","V","C-125",[["UO-05 +","T37","WHT","sig"],["UO-05 \u2212","T38","BLK","ret"]]],["ALC-36","UI-01","Supply Fan Status","DI","C-201",[["UI-01 +","T41","WHT","sig"],["UI-01 \u2212","T42","BLK","ret"]]],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202",[["UI-02 +","T43","WHT","sig"],["UI-02 \u2212","T44","BLK","ret"]]],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205",[["UI-05 +","T49","WHT","sig"],["UI-05 \u2212","T50","BLK","ret"]]],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206",[["UI-06 +","T51","WHT","sig"],["UI-06 \u2212","T52","BLK","ret"]]],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221",[["UO-01 +","T65 (24V)","WHT","feed"],["UO-01 \u2212","CR-27 coil","BLK","sw"]]],["ALC-36","UO-02","Supply Fan Speed","V","C-222",[["UO-02 +","T69","WHT","sig"],["UO-02 \u2212","T70","BLK","ret"]]],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223",[["UO-03 +","T65 (24V)","WHT","feed"],["UO-03 \u2212","CR-28 coil","BLK","sw"]]],["ALC-36","UO-04","Exhaust Fan Speed","V","C-224",[["UO-04 +","T73","WHT","sig"],["UO-04 \u2212","T74","BLK","ret"]]]]};
+const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101",["T3","T4"]],["ALC-35","UI-02","Space Pressure","mA","C-102",["T6","T5"]],["ALC-35","UI-05","Supply Air Temp","TH","C-105",["T11","T12"]],["ALC-35","UI-06","Return Air Temp","TH","C-106",["T13","T14"]],["ALC-35","UI-07","Return Air Hum","mA","C-107",["T16","T15"]],["ALC-35","UI-09","Mixed Air Temp","TH","C-109",["T19","T20"]],["ALC-35","UI-11","Filters Diff Pressure","VI","C-111",["T23","T24"]],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112",["T25","T26"]],["ALC-35","UO-01","CHW Valve","VO","C-121",["T29","T30"]],["ALC-35","UO-02","Gas Valve Enable","DO","C-122",["T27 (24V)","CR-34 coil"]],["ALC-35","UO-03","Gas Valve Signal","VO","C-123",["T33","T34"]],["ALC-35","UO-04","Economizer Dampers","VO","C-124",["T35","T36"]],["ALC-35","UO-05","Exhaust Air Damper","VO","C-125",["T37","T38"]],["ALC-36","UI-01","Supply Fan Status","DI","C-201",["T41","T42"]],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202",["T43","T44"]],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205",["T49","T50"]],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206",["T51","T52"]],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221",["T65 (24V)","CR-27 coil"]],["ALC-36","UO-02","Supply Fan Speed","VO","C-222",["T69","T70"]],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223",["T65 (24V)","CR-28 coil"]],["ALC-36","UO-04","Exhaust Fan Speed","VO","C-224",["T73","T74"]]]};
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const TYPES={TH:'thermistor',mA:'4–20 mA',V:'0–5/10 V',DI:'dry contact',DO:'relay',RNET:'Rnet sensor',PWR:'24 VAC'};
+const TYPES={TH:'thermistor',mA:'4–20 mA (2-wire)',VI:'0–5/10 V input',VO:'0–10 V output',DI:'dry contact in',DO:'dry contact out',DON:'relay NO',RNET:'Rnet sensor',PWR:'24 VAC power'};
+// Wiring templates — the app's codebook. screws: [label, role, caption]. Land terminals map positionally. No wire colors: field colors vary.
+const TPL={
+ TH:{screws:[['+','sig','signal'],['−','ret','return']],tip:'Two-wire thermistor. Polarity is not electrically critical, but land per drawing so every strip reads the same.'},
+ VI:{screws:[['+','sig','signal'],['−','ret','common']],tip:'Signal on +, device common on −. If the device needs power, feed it from 24 Vdc per the drawing — not from the input.'},
+ mA:{screws:[['24Vdc +','pwr','loop power out'],['+','sig','loop return in']],tip:'2-wire loop: 24 Vdc + feeds the device, the device return lands on the input +. The input − screw is NOT used.',fixed:[true,false]},
+ DI:{screws:[['+','sig','contact'],['−','ret','contact']],tip:'Dry contact from the device. The controller supplies the sensing voltage — do NOT bring any external voltage to these screws.'},
+ VO:{screws:[['+','sig','0–10 V signal'],['−','ret','common']],tip:'Analog output: + carries the signal, − is the reference to the device common. Both are needed.'},
+ DO:{screws:[['+','feed','supply IN'],['−','sw','switched OUT to load']],dry:'Bring supply in on +; − switches it out to the load.'},
+ DON:{screws:[['NO','sw','switched OUT to load']],dry:'Normally-open contact. The contact common must be fed from the load\'s supply — see the unit\'s R/C terminals.'},
+ RNET:{screws:[['Gnd','net','ground'],['Rnet+','net','data +'],['Rnet−','net','data −'],['+12V','net','sensor power']],tip:'Four-conductor Rnet to the ZS sensor. All four wires land at the sensor; match the screw labels on both ends.',single:true},
+ PWR:{screws:[['24 Vac','pwr','hot'],['Gnd','ret','common']],tip:'Controller power. Ground screw to the same common as the transformer / unit secondary; do not tie to earth.'}};
 const ROLES={bc:'Building controller',exp:'I/O expander',zn:'Zone controller'};
 
 // ---------- payload decode ----------
@@ -189,34 +203,61 @@ function show(r){
       <dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd class="${v==null||v===''?'na':''}">${v==null||v===''?'not set':esc(v)}</dd>`).join('')}</dl></div>`}).join('');
   const devs=Object.entries(byCtl).map(([tag,pts])=>{
     const c=ctlBy[tag]||{};
-    const ROLE={sig:'signal',ret:'return',pwr:'loop power',feed:'supply IN',sw:'switched OUT to load',net:''};
-    const row=p=>{
-      const w=Array.isArray(p[5])?p[5]:[];
-      const key=[p[0],p[1],p[2],p[3],p[4],p[6],...w.flat()].filter(Boolean).join(' ');
-      const conds=w.map(c=>`<span class="sc">${esc(c[0])}</span><span class="ld"><span class="arrow">→ </span><b>${esc(c[1]||'at controller')}</b>${ROLE[c[3]]?`<small>${ROLE[c[3]]}</small>`:''}</span>${c[2]?`<span class="w ${esc(c[2])}"><i></i>${esc(c[2])}</span>`:'<span></span>'}`).join('');
-      const feed=w.find(c=>c[3]==='feed'),sw=w.find(c=>c[3]==='sw');
-      const dry=p[3]==='DO'?`<div class="dry"><b>Dry contact — this output supplies no voltage.</b>${feed?`Bring supply in on <b>${esc(feed[0])}</b>; <b>${esc(sw[0])}</b> switches it out to the load.`:`Contact closes between the screws; the load's supply must come from elsewhere${p[7]?'':' (see drawing)'}.`}</div>`:'';
-      const ma=p[3]==='mA'?`<div class="note">2-wire loop: 24 Vdc + feeds the device, device return lands on the input +. Input − is not used.</div>`:'';
-      return `<div class="pt s" data-k="${esc(key)}"><span class="ch">${esc(p[1])}</span><span class="n">${esc(p[2])}<small>${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}${p[6]?' · '+esc(p[6]):''}</small></span>${conds?`<div class="cond">${conds}</div>`:''}${dry}${ma}${p[7]?`<div class="note">${esc(p[7])}</div>`:''}</div>`};
-    const ui=pts.filter(p=>/^(UI|IN|AI|BI|Rnet)/i.test(p[1])),uo=pts.filter(p=>/^(UO|DO|AO|BO)/i.test(p[1])),other=pts.filter(p=>!ui.includes(p)&&!uo.includes(p));
+    const row=(p,i)=>{const lands=Array.isArray(p[5])?p[5]:[];const key=[p[0],p[1],p[2],p[3],p[4],p[6],...lands,TYPES[p[3]]||''].filter(Boolean).join(' ');
+      return `<div class="pt s" data-k="${esc(key)}" data-i="${i}"><span class="ch">${esc(p[1])}</span><span class="n">${esc(p[2])}<small>${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}${p[6]?' · '+esc(p[6]):''}</small></span><span class="r"><b>${esc(lands.join(' / ')||'at ctlr')}</b>tap for wiring</span></div>`};
+    const idx=p=>(r.pts||[]).indexOf(p);const R=p=>row(p,idx(p));const ui=pts.filter(p=>/^(UI|IN|AI|BI|Rnet)/i.test(p[1])),uo=pts.filter(p=>/^(UO|DO|AO|BO)/i.test(p[1])),other=pts.filter(p=>!ui.includes(p)&&!uo.includes(p));
     return `<div class="dev"><div class="h"><span class="tag">${esc(tag)}</span><span class="mdl"><b>${esc(c.mdl||'')}</b>${c.exp!=null?' · Expander '+c.exp:''}</span></div>
-      ${ui.length?'<div class="grp">Inputs</div>'+ui.map(row).join(''):''}${uo.length?'<div class="grp">Outputs</div>'+uo.map(row).join(''):''}${other.length?'<div class="grp">Points</div>'+other.map(row).join(''):''}</div>`}).join('');
+      ${ui.length?'<div class="grp">Inputs</div>'+ui.map(R).join(''):''}${uo.length?'<div class="grp">Outputs</div>'+uo.map(R).join(''):''}${other.length?'<div class="grp">Points</div>'+other.map(R).join(''):''}</div>`}).join('');
   $('#app').innerHTML=`
   <div class="hd"><div class="u">${esc(r.unit)}</div><div class="t">${esc(r.typ||'')}</div>
    <div class="m">Job <b>${esc(r.job||'—')}</b> · sheets <b>${esc((r.sh||[]).join(', '))}</b> · rev <b>${esc(r.rev||'—')}</b></div>
    ${r.asb?`<div class="m">As-built <b>${esc(r.asb)}</b></div>`:`<div class="warn">No as-built date — generated from submittal, not verified in field</div>`}</div>
   <div class="search"><input id="q" type="search" placeholder="Find a point, channel, cable, terminal…" autocomplete="off"><div class="hint" id="hint"></div></div>
   <h2>Network<span>Controllers</span></h2><div class="ctl">${ctls}</div>
-  <h2>Screw → lands at · wire color<span>Points</span></h2>${devs}
+  <h2>Tap a point for screw-by-screw wiring<span>Points</span></h2>${devs}
   <div class="foot">Tag format v${esc(r.v||1)} · ${(r.pts||[]).length} points</div>`;
   const items=[...document.querySelectorAll('.s')];
   $('#q').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();let n=0;
     items.forEach(el=>{const hit=q&&el.dataset.k.toLowerCase().includes(q);el.classList.toggle('hit',hit);el.classList.toggle('dim',!!q&&!hit);if(hit)n++});
     $('#hint').textContent=q?(n?`${n} match${n>1?'es':''}`:'No matches'):'';
     if(q&&n){const f=items.find(el=>el.classList.contains('hit'));f&&f.scrollIntoView({block:'center'})}});
+  document.querySelectorAll('.pt').forEach(el=>el.onclick=()=>openSheet(r,+el.dataset.i));
   window.scrollTo(0,0);
 }
 $('#home').onclick=home;
+
+// ---------- wiring sheet ----------
+function wiringSVG(p,t,ch){
+  const n=t.screws.length,rowH=34,H=40+n*rowH,W=360;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">`;
+  s+=`<rect x="8" y="8" width="112" height="${H-16}" rx="6" fill="#EAEFEA" stroke="#111512" stroke-width="1.5"/>`;
+  s+=`<text x="64" y="26" text-anchor="middle" font-size="11" fill="#5B655C">${esc(p[0])}</text>`;
+  s+=`<rect x="${W-120}" y="8" width="112" height="${H-16}" rx="6" fill="#fff" stroke="#111512" stroke-width="1.5"/>`;
+  s+=`<text x="${W-64}" y="26" text-anchor="middle" font-size="11" fill="#5B655C">${esc(t.single?(p[6]||'device'):(p[6]||'lands at'))}</text>`;
+  t.screws.forEach((sc,i)=>{const y=44+i*rowH;const lbl=/^[+−]$/.test(sc[0])?ch+' '+sc[0]:sc[0];const land=t.single?(p[5]&&p[5][0])||'':(p[5]&&p[5][i])||'';
+    s+=`<rect x="16" y="${y-11}" width="96" height="22" rx="3" fill="#fff" stroke="#CFD6D0"/><text x="64" y="${y+4}" text-anchor="middle" font-size="12" font-weight="700" fill="#111512">${esc(lbl)}</text>`;
+        s+=`<line x1="112" y1="${y}" x2="${W-120}" y2="${y}" stroke="#111512" stroke-width="2.5" stroke-linecap="round"/>`;
+    s+=`<text x="${W/2}" y="${y-7}" text-anchor="middle" font-size="10" fill="#5B655C">${esc(sc[2])}</text>`;
+    if(sc[1]==='feed')s+=`<text x="${W/2}" y="${y+16}" text-anchor="middle" font-size="10" font-weight="700" fill="#7A5300">supply →</text>`;
+    if(sc[1]==='sw')s+=`<text x="${W/2}" y="${y+16}" text-anchor="middle" font-size="10" font-weight="700" fill="#7A5300">→ to load</text>`;
+    s+=`<rect x="${W-112}" y="${y-11}" width="96" height="22" rx="3" fill="#EAEFEA" stroke="#CFD6D0"/><text x="${W-64}" y="${y+4}" text-anchor="middle" font-size="12" font-weight="700" fill="#111512">${esc(land)}</text>`;});
+  if(t.dry&&n===2){s+=`<path d="M 106 ${44+rowH/2-9} l 0 -7 M 106 ${44+rowH/2+9} l 0 7" stroke="#111512" stroke-width="1.5"/><path d="M 106 ${44+rowH/2-9} l 10 14" stroke="#111512" stroke-width="1.5"/><circle cx="106" cy="${44+rowH/2-9}" r="2" fill="#111512"/><circle cx="106" cy="${44+rowH/2+9}" r="2" fill="#111512"/>`}
+  return s+'</svg>';
+}
+function openSheet(r,i){
+  const p=r.pts[i],t=TPL[p[3]]||TPL.TH,ch=p[1];
+  const rows=t.screws.map((sc,j)=>{const lbl=/^[+−]$/.test(sc[0])?ch+' '+sc[0]:sc[0];const land=t.single?(p[5]&&p[5][0])||'':(p[5]&&p[5][j])||'';
+    return `<span class="sc">${esc(lbl)}</span><span class="ld"><b>→ ${esc(land||'at controller')}</b><small>${esc(sc[2])}</small></span>`}).join('');
+  $('#pn').innerHTML=`<div class="grab"></div><h3>${esc(p[2])}</h3><div class="sub">${esc(p[0])} · ${esc(ch)} · ${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}${p[6]?' · '+esc(p[6]):''}</div>
+   ${wiringSVG(p,t,ch)}<div class="wl">${rows}</div>
+   ${t.dry?`<div class="dry"><b>Dry contact — this output supplies no voltage.</b>${t.dry}</div>`:''}
+   ${t.tip?`<div class="tip">${t.tip}</div>`:''}${p[7]?`<div class="tip"><b>Drawing note:</b> ${esc(p[7])}</div>`:''}
+   <button class="close" id="cls">Close</button>`;
+  $('#sheet').classList.add('on');$('#cls').onclick=closeSheet;
+}
+function closeSheet(){$('#sheet').classList.remove('on')}
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
 
 // ---------- boot ----------
 (async()=>{

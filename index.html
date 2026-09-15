@@ -107,6 +107,7 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 // ---------- sample tag (AHU-34, sheet 1.11) ----------
 const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101",["T3","T4"]],["ALC-35","UI-02","Space Pressure","mA","C-102",["T6","T5"]],["ALC-35","UI-05","Supply Air Temp","TH","C-105",["T11","T12"]],["ALC-35","UI-06","Return Air Temp","TH","C-106",["T13","T14"]],["ALC-35","UI-07","Return Air Hum","mA","C-107",["T16","T15"]],["ALC-35","UI-09","Mixed Air Temp","TH","C-109",["T19","T20"]],["ALC-35","UI-11","Filters Diff Pressure","VI","C-111",["T23","T24"]],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112",["T25","T26"]],["ALC-35","UO-01","CHW Valve","VO","C-121",["T29","T30"]],["ALC-35","UO-02","Gas Valve Enable","DO","C-122",["T27 (24V)","CR-34 coil"]],["ALC-35","UO-03","Gas Valve Signal","VO","C-123",["T33","T34"]],["ALC-35","UO-04","Economizer Dampers","VO","C-124",["T35","T36"]],["ALC-35","UO-05","Exhaust Air Damper","VO","C-125",["T37","T38"]],["ALC-36","UI-01","Supply Fan Status","DI","C-201",["T41","T42"]],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202",["T43","T44"]],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205",["T49","T50"]],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206",["T51","T52"]],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221",["T65 (24V)","CR-27 coil"]],["ALC-36","UO-02","Supply Fan Speed","VO","C-222",["T69","T70"]],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223",["T65 (24V)","CR-28 coil"]],["ALC-36","UO-04","Exhaust Fan Speed","VO","C-224",["T73","T74"]]]};
 
+const BUILD='8';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const TYPES={TH:'thermistor',mA:'4–20 mA (2-wire)',VI:'0–5/10 V input',VO:'0–10 V output',DI:'dry contact in',DO:'dry contact out',DON:'relay NO',RNET:'Rnet sensor',PWR:'24 VAC power'};
@@ -154,11 +155,14 @@ function home(){
   <details><summary>Paste a tag payload or JSON</summary>
    <textarea id="paste" placeholder="Paste the full tag URL, the part after #, or the raw JSON"></textarea>
    <button class="sec" id="b-paste">Open</button></details>
+  <div class="install" style="margin-top:10px">Build <b id="bld"></b> · <a href="#" id="reload" style="color:var(--green)">Force update</a> — clears the cached app and reloads the newest version.</div>
   <div class="install"><b>Install:</b> iPhone — Share → Add to Home Screen. Android — menu → Install app. After that the stock camera opens tags here, offline.</div>
   </div>`;
   $('#b-scan').onclick=startScan;
   $('#b-sample').onclick=()=>show(SAMPLE);
   $('#b-pic').onclick=()=>$('#pic').click();
+  $('#bld').textContent=BUILD;
+  $('#reload').onclick=async e=>{e.preventDefault();try{const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.unregister();const ks=await caches.keys();for(const k of ks)await caches.delete(k)}catch{}location.href=location.pathname+'?v='+Date.now()};
   $('#b-paste').onclick=async()=>{try{show(await decodePayload($('#paste').value))}catch(e){err(e.message)}};
 }
 function err(m){const e=$('#err');if(e){e.textContent=m;e.style.display='block'}else alert(m)}
@@ -230,7 +234,7 @@ function show(r){
   <div class="search"><input id="q" type="search" placeholder="Find a point, channel, cable, terminal…" autocomplete="off"><div class="hint" id="hint"></div></div>
   <h2>Network<span>Controllers</span></h2><div class="ctl">${ctls}</div>
   <h2>Tap a point for screw-by-screw wiring<span>Points</span></h2>${devs}
-  <div class="foot">Tag format v${esc(r.v||1)} · ${(r.pts||[]).length} points</div>`;
+  <div class="foot">Tag format v${esc(r.v||1)} · ${(r.pts||[]).length} points · app build ${BUILD}</div>`;
   const items=[...document.querySelectorAll('.s')];
   $('#q').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();let n=0;
     items.forEach(el=>{const hit=q&&el.dataset.k.toLowerCase().includes(q);el.classList.toggle('hit',hit);el.classList.toggle('dim',!!q&&!hit);if(hit)n++});

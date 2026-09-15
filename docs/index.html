@@ -36,7 +36,7 @@ textarea{width:100%;min-height:110px;font:13px/1.4 ui-monospace,Menlo,monospace;
 .scan{position:fixed;inset:0;background:#000;z-index:20;display:none;flex-direction:column}
 .scan video{flex:1;width:100%;object-fit:cover}
 .scan .bar{padding:14px 16px calc(env(safe-area-inset-bottom) + 14px);display:flex;justify-content:space-between;align-items:center;color:#fff;background:#000}
-.scan .bar button{background:#fff;color:#000;border:0;border-radius:99px;padding:9px 18px;font-weight:600}
+.scan .bar button{background:#fff;color:#000;border:0;border-radius:99px;padding:9px 14px;font-weight:600;font-size:14px}
 .reticle{position:absolute;left:50%;top:45%;width:min(70vw,320px);aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none}
 /* record */
 .hd{padding:18px 0 12px;border-bottom:3px solid var(--green)}
@@ -71,6 +71,21 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 .pt .n small{display:block;color:var(--ink2);font-size:12px;margin-top:2px}
 .pt .r{text-align:right;font-size:12.5px;line-height:1.3}
 .pt .r b{display:block;font-size:14px}
+.pt{cursor:pointer}
+.pt .r{text-align:right;font-size:12.5px;line-height:1.3;color:var(--ink2);max-width:120px}.pt .r b{display:block;font-size:14px;color:var(--ink)}
+.sheet{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex}
+.sheet .pn{background:#fff;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 20px)}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--rule);margin:0 auto 12px}
+.sheet h3{margin:0;font-size:20px}.sheet .sub{color:var(--ink2);font-size:13px;margin:2px 0 10px}
+.sheet svg{width:100%;height:auto;display:block;margin:6px 0 10px}
+.wl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:14px;align-items:center;margin-bottom:10px}
+.wl .sc{font-weight:700;background:var(--strip);border:1px solid var(--rule);border-radius:3px;padding:2px 7px;white-space:nowrap}
+.wl .ld b{font-weight:600}.wl .ld small{display:block;color:var(--ink2);font-size:12px}
+.dry{font-size:13.5px;background:#FFF2B3;border-left:3px solid #C99A00;padding:8px 10px;border-radius:0 6px 6px 0;line-height:1.4;margin-bottom:10px}
+.dry>b:first-child{display:block;margin-bottom:2px}
+.tip{font-size:13.5px;color:var(--ink2);line-height:1.4;margin-bottom:8px}
+.close{display:block;width:100%;padding:12px;border:1.5px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink);font-size:15px;margin-top:6px}
 .hit{background:var(--hi)!important;box-shadow:inset 0 0 0 2px var(--yel)}
 .dim{opacity:.25}
 .foot{margin-top:28px;font-size:12px;color:var(--ink2);text-align:center}
@@ -82,17 +97,31 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 
 <div class="wrap" id="app"></div>
 
+<div class="sheet" id="sheet"><div class="pn" id="pn"></div></div>
 <div class="scan" id="scan"><video id="vid" playsinline muted></video><div class="reticle"></div>
-<div class="bar"><span id="scanmsg">Point at a tag</span><button id="stop">Cancel</button></div></div>
+<div class="bar"><span id="scanmsg">Point at a tag</span><span><button id="takepic" style="margin-right:8px">Take photo</button><button id="stop">Cancel</button></span></div></div>
+<input type="file" id="pic" accept="image/*" capture="environment" hidden>
 
 <script src="jsqr.js"></script>
 <script>
 // ---------- sample tag (AHU-34, sheet 1.11) ----------
-const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101","T3-4"],["ALC-35","UI-02","Space Pressure","mA","C-102","T5-6"],["ALC-35","UI-05","Supply Air Temp","TH","C-105","T11-12"],["ALC-35","UI-06","Return Air Temp","TH","C-106","T13-14"],["ALC-35","UI-07","Return Air Hum","mA","C-107","T15-16"],["ALC-35","UI-09","Mixed Air Temp","TH","C-109","T19-20"],["ALC-35","UI-11","Filters Diff Pressure","V","C-111","T23-24"],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112","T25-26"],["ALC-35","UO-01","CHW Valve","V","C-121","T29-30"],["ALC-35","UO-02","Gas Valve Enable","DO","C-122","T31-32"],["ALC-35","UO-03","Gas Valve Signal","V","C-123","T33-34"],["ALC-35","UO-04","Economizer Dampers","V","C-124","T35-36"],["ALC-35","UO-05","Exhaust Air Damper","V","C-125","T37-38"],["ALC-36","UI-01","Supply Fan Status","DI","C-201","T41-42"],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202","T43-44"],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205","T49-50"],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206","T51-52"],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221","T67-68"],["ALC-36","UO-02","Supply Fan Speed","V","C-222","T69-70"],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223","T71-72"],["ALC-36","UO-04","Exhaust Fan Speed","V","C-224","T73-74"]]};
+const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101",["T3","T4"]],["ALC-35","UI-02","Space Pressure","mA","C-102",["T6","T5"]],["ALC-35","UI-05","Supply Air Temp","TH","C-105",["T11","T12"]],["ALC-35","UI-06","Return Air Temp","TH","C-106",["T13","T14"]],["ALC-35","UI-07","Return Air Hum","mA","C-107",["T16","T15"]],["ALC-35","UI-09","Mixed Air Temp","TH","C-109",["T19","T20"]],["ALC-35","UI-11","Filters Diff Pressure","VI","C-111",["T23","T24"]],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112",["T25","T26"]],["ALC-35","UO-01","CHW Valve","VO","C-121",["T29","T30"]],["ALC-35","UO-02","Gas Valve Enable","DO","C-122",["T27 (24V)","CR-34 coil"]],["ALC-35","UO-03","Gas Valve Signal","VO","C-123",["T33","T34"]],["ALC-35","UO-04","Economizer Dampers","VO","C-124",["T35","T36"]],["ALC-35","UO-05","Exhaust Air Damper","VO","C-125",["T37","T38"]],["ALC-36","UI-01","Supply Fan Status","DI","C-201",["T41","T42"]],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202",["T43","T44"]],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205",["T49","T50"]],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206",["T51","T52"]],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221",["T65 (24V)","CR-27 coil"]],["ALC-36","UO-02","Supply Fan Speed","VO","C-222",["T69","T70"]],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223",["T65 (24V)","CR-28 coil"]],["ALC-36","UO-04","Exhaust Fan Speed","VO","C-224",["T73","T74"]]]};
 
+const BUILD='8';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const TYPES={TH:'thermistor',mA:'4–20 mA',V:'0–10 V',DI:'dry contact',DO:'relay'};
+const TYPES={TH:'thermistor',mA:'4–20 mA (2-wire)',VI:'0–5/10 V input',VO:'0–10 V output',DI:'dry contact in',DO:'dry contact out',DON:'relay NO',RNET:'Rnet sensor',PWR:'24 VAC power'};
+// Wiring templates — the app's codebook. screws: [label, role, caption]. Land terminals map positionally. No wire colors: field colors vary.
+const TPL={
+ TH:{screws:[['+','sig','signal'],['−','ret','return']],tip:'Two-wire thermistor. Polarity is not electrically critical, but land per drawing so every strip reads the same.'},
+ VI:{screws:[['+','sig','signal'],['−','ret','common']],tip:'Signal on +, device common on −. If the device needs power, feed it from 24 Vdc per the drawing — not from the input.'},
+ mA:{screws:[['24Vdc +','pwr','loop power out'],['+','sig','loop return in']],tip:'2-wire loop: 24 Vdc + feeds the device, the device return lands on the input +. The input − screw is NOT used.',fixed:[true,false]},
+ DI:{screws:[['+','sig','contact'],['−','ret','contact']],tip:'Dry contact from the device. The controller supplies the sensing voltage — do NOT bring any external voltage to these screws.'},
+ VO:{screws:[['+','sig','0–10 V signal'],['−','ret','common']],tip:'Analog output: + carries the signal, − is the reference to the device common. Both are needed.'},
+ DO:{screws:[['+','feed','supply IN'],['−','sw','switched OUT to load']],dry:'Bring supply in on +; − switches it out to the load.'},
+ DON:{screws:[['NO','sw','switched OUT to load']],dry:'Normally-open contact. The contact common must be fed from the load\'s supply — see the unit\'s R/C terminals.'},
+ RNET:{screws:[['Gnd','net','ground'],['Rnet+','net','data +'],['Rnet−','net','data −'],['+12V','net','sensor power']],tip:'Four-conductor Rnet to the ZS sensor. All four wires land at the sensor; match the screw labels on both ends.',single:true},
+ PWR:{screws:[['24 Vac','pwr','hot'],['Gnd','ret','common']],tip:'Controller power. Ground screw to the same common as the transformer / unit secondary; do not tie to earth.'}};
 const ROLES={bc:'Building controller',exp:'I/O expander',zn:'Zone controller'};
 
 // ---------- payload decode ----------
@@ -120,44 +149,61 @@ function home(){
   <h1>Scan an equipment tag</h1>
   <p>Wiring and network reference for the unit you're standing at. Works offline once this page has loaded.</p>
   <button class="big" id="b-scan">Scan tag</button>
+  <button class="sec" id="b-pic">Take a photo of a tag</button>
   <button class="sec" id="b-sample">Open sample tag (AHU-34)</button>
   <div class="err" id="err"></div>
   <details><summary>Paste a tag payload or JSON</summary>
    <textarea id="paste" placeholder="Paste the full tag URL, the part after #, or the raw JSON"></textarea>
    <button class="sec" id="b-paste">Open</button></details>
+  <div class="install" style="margin-top:10px">Build <b id="bld"></b> · <a href="#" id="reload" style="color:var(--green)">Force update</a> — clears the cached app and reloads the newest version.</div>
   <div class="install"><b>Install:</b> iPhone — Share → Add to Home Screen. Android — menu → Install app. After that the stock camera opens tags here, offline.</div>
   </div>`;
   $('#b-scan').onclick=startScan;
   $('#b-sample').onclick=()=>show(SAMPLE);
+  $('#b-pic').onclick=()=>$('#pic').click();
+  $('#bld').textContent=BUILD;
+  $('#reload').onclick=async e=>{e.preventDefault();try{const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.unregister();const ks=await caches.keys();for(const k of ks)await caches.delete(k)}catch{}location.href=location.pathname+'?v='+Date.now()};
   $('#b-paste').onclick=async()=>{try{show(await decodePayload($('#paste').value))}catch(e){err(e.message)}};
 }
 function err(m){const e=$('#err');if(e){e.textContent=m;e.style.display='block'}else alert(m)}
+function errSafe(m){if(!$('#err'))home();err(m)}
 
 // ---------- scanner ----------
-let stream,raf;
+let stream,raf,frames=0;
+function decodeImageData(img){const q=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});return q?q.data:null}
 async function startScan(){
   const sc=$('#scan'),v=$('#vid'),msg=$('#scanmsg');
-  sc.style.display='flex'; msg.textContent='Point at a tag';
-  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1280}}});}
-  catch(e){sc.style.display='none';err('Camera unavailable: '+e.message+(location.protocol==='file:'?' — camera needs https (or use Paste / the sample tag to test).':''));return}
-  v.srcObject=stream; await v.play();
+  sc.style.display='flex'; msg.textContent='Starting camera…'; frames=0;
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:960}},audio:false});}
+  catch(e){msg.textContent='Camera blocked: '+e.name+'. Use "Take photo" below.';return}
+  v.srcObject=stream; v.setAttribute('autoplay',''); v.setAttribute('playsinline',''); v.muted=true;
+  try{await v.play()}catch(e){msg.textContent='Preview failed: '+e.name+'. Use "Take photo" below.';return}
   const det=('BarcodeDetector' in window)?new BarcodeDetector({formats:['qr_code']}):null;
   const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
+  let busy=false;
   const loop=async()=>{
     if(!stream) return;
-    let text=null;
-    if(v.readyState>=2){
-      if(det){try{const r=await det.detect(v);if(r[0])text=r[0].rawValue}catch{}}
-      else{cv.width=v.videoWidth;cv.height=v.videoHeight;cx.drawImage(v,0,0);
-        const img=cx.getImageData(0,0,cv.width,cv.height);const q=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});if(q)text=q.data}
-    }
-    if(text){msg.textContent='Reading…';try{const rec=await decodePayload(text);stopScan();show(rec);return}catch(e){msg.textContent=e.message}}
+    if(!busy&&v.readyState>=2&&v.videoWidth){busy=true;frames++;let text=null;
+      if(det){try{const r=await det.detect(v);if(r&&r[0])text=r[0].rawValue}catch{}}
+      if(!text){const s=Math.min(1,800/Math.max(v.videoWidth,v.videoHeight));cv.width=v.videoWidth*s|0;cv.height=v.videoHeight*s|0;cx.drawImage(v,0,0,cv.width,cv.height);text=decodeImageData(cx.getImageData(0,0,cv.width,cv.height))}
+      if(text){msg.textContent='Reading…';try{const rec=await decodePayload(text);stopScan();show(rec);return}catch(e){msg.textContent=e.message}}
+      else if(frames%15===0)msg.textContent=`Point at a tag (${frames} frames)`;
+      busy=false}
     raf=requestAnimationFrame(loop);
   };
   loop();
 }
-function stopScan(){cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('#scan').style.display='none'}
+function stopScan(){cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}const v=$('#vid');v.pause();v.srcObject=null;$('#scan').style.display='none'}
 $('#stop').onclick=stopScan;
+// photo fallback — uses the phone's own camera app, no getUserMedia needed
+$('#pic').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';
+  try{const bmp=await createImageBitmap(f);const s=Math.min(1,1600/Math.max(bmp.width,bmp.height));const cv=document.createElement('canvas');cv.width=bmp.width*s|0;cv.height=bmp.height*s|0;const cx=cv.getContext('2d');cx.drawImage(bmp,0,0,cv.width,cv.height);
+    let text=decodeImageData(cx.getImageData(0,0,cv.width,cv.height));
+    if(!text){const cv2=document.createElement('canvas');cv2.width=cv.width/2|0;cv2.height=cv.height/2|0;cv2.getContext('2d').drawImage(cv,0,0,cv2.width,cv2.height);text=decodeImageData(cv2.getContext('2d').getImageData(0,0,cv2.width,cv2.height))}
+    if(!text)throw new Error('No QR code found in that photo. Fill the frame with the code and try again.');
+    stopScan();show(await decodePayload(text))}
+  catch(ex){stopScan();errSafe(ex.message)}});
+$('#takepic').onclick=()=>$('#pic').click();
 
 // ---------- render ----------
 function show(r){
@@ -167,7 +213,7 @@ function show(r){
   const ctls=(r.ctl||[]).map(c=>{
     const rows=[];
     if(c.role) rows.push(['Role',ROLES[c.role]||c.role]);
-    if(c.role==='bc'||'di' in c) rows.push(['Device instance',c.di]);
+    if('di' in c) rows.push(['Device instance',c.di]);
     if('mac' in c) rows.push(['MAC',c.mac]);
     if(c.net) rows.push(['Network',c.net]);
     if('ip' in c) rows.push(['IP',c.ip]);
@@ -176,26 +222,61 @@ function show(r){
       <dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd class="${v==null||v===''?'na':''}">${v==null||v===''?'not set':esc(v)}</dd>`).join('')}</dl></div>`}).join('');
   const devs=Object.entries(byCtl).map(([tag,pts])=>{
     const c=ctlBy[tag]||{};
-    const row=p=>`<div class="pt s" data-k="${esc(p.join(' ')+' '+(TYPES[p[3]]||''))}"><span class="ch">${esc(p[1])}</span><span class="n">${esc(p[2])}<small>${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}</small></span><span class="r"><b>${esc(p[5]||'')}</b></span></div>`;
-    const ui=pts.filter(p=>/^UI/.test(p[1])),uo=pts.filter(p=>/^UO/.test(p[1])),other=pts.filter(p=>!/^U[IO]/.test(p[1]));
+    const row=(p,i)=>{const lands=Array.isArray(p[5])?p[5]:[];const key=[p[0],p[1],p[2],p[3],p[4],p[6],...lands,TYPES[p[3]]||''].filter(Boolean).join(' ');
+      return `<div class="pt s" data-k="${esc(key)}" data-i="${i}"><span class="ch">${esc(p[1])}</span><span class="n">${esc(p[2])}<small>${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}${p[6]?' · '+esc(p[6]):''}</small></span><span class="r"><b>${esc(lands.join(' / ')||'at ctlr')}</b>tap for wiring</span></div>`};
+    const idx=p=>(r.pts||[]).indexOf(p);const R=p=>row(p,idx(p));const ui=pts.filter(p=>/^(UI|IN|AI|BI|Rnet)/i.test(p[1])),uo=pts.filter(p=>/^(UO|DO|AO|BO)/i.test(p[1])),other=pts.filter(p=>!ui.includes(p)&&!uo.includes(p));
     return `<div class="dev"><div class="h"><span class="tag">${esc(tag)}</span><span class="mdl"><b>${esc(c.mdl||'')}</b>${c.exp!=null?' · Expander '+c.exp:''}</span></div>
-      ${ui.length?'<div class="grp">Inputs</div>'+ui.map(row).join(''):''}${uo.length?'<div class="grp">Outputs</div>'+uo.map(row).join(''):''}${other.length?'<div class="grp">Points</div>'+other.map(row).join(''):''}</div>`}).join('');
+      ${ui.length?'<div class="grp">Inputs</div>'+ui.map(R).join(''):''}${uo.length?'<div class="grp">Outputs</div>'+uo.map(R).join(''):''}${other.length?'<div class="grp">Points</div>'+other.map(R).join(''):''}</div>`}).join('');
   $('#app').innerHTML=`
   <div class="hd"><div class="u">${esc(r.unit)}</div><div class="t">${esc(r.typ||'')}</div>
    <div class="m">Job <b>${esc(r.job||'—')}</b> · sheets <b>${esc((r.sh||[]).join(', '))}</b> · rev <b>${esc(r.rev||'—')}</b></div>
    ${r.asb?`<div class="m">As-built <b>${esc(r.asb)}</b></div>`:`<div class="warn">No as-built date — generated from submittal, not verified in field</div>`}</div>
   <div class="search"><input id="q" type="search" placeholder="Find a point, channel, cable, terminal…" autocomplete="off"><div class="hint" id="hint"></div></div>
   <h2>Network<span>Controllers</span></h2><div class="ctl">${ctls}</div>
-  <h2>Channel · point · cable · terminals<span>Points</span></h2>${devs}
-  <div class="foot">Tag format v${esc(r.v||1)} · ${(r.pts||[]).length} points</div>`;
+  <h2>Tap a point for screw-by-screw wiring<span>Points</span></h2>${devs}
+  <div class="foot">Tag format v${esc(r.v||1)} · ${(r.pts||[]).length} points · app build ${BUILD}</div>`;
   const items=[...document.querySelectorAll('.s')];
   $('#q').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();let n=0;
     items.forEach(el=>{const hit=q&&el.dataset.k.toLowerCase().includes(q);el.classList.toggle('hit',hit);el.classList.toggle('dim',!!q&&!hit);if(hit)n++});
     $('#hint').textContent=q?(n?`${n} match${n>1?'es':''}`:'No matches'):'';
     if(q&&n){const f=items.find(el=>el.classList.contains('hit'));f&&f.scrollIntoView({block:'center'})}});
+  document.querySelectorAll('.pt').forEach(el=>el.onclick=()=>openSheet(r,+el.dataset.i));
   window.scrollTo(0,0);
 }
 $('#home').onclick=home;
+
+// ---------- wiring sheet ----------
+function wiringSVG(p,t,ch){
+  const n=t.screws.length,rowH=34,H=40+n*rowH,W=360;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">`;
+  s+=`<rect x="8" y="8" width="112" height="${H-16}" rx="6" fill="#EAEFEA" stroke="#111512" stroke-width="1.5"/>`;
+  s+=`<text x="64" y="26" text-anchor="middle" font-size="11" fill="#5B655C">${esc(p[0])}</text>`;
+  s+=`<rect x="${W-120}" y="8" width="112" height="${H-16}" rx="6" fill="#fff" stroke="#111512" stroke-width="1.5"/>`;
+  s+=`<text x="${W-64}" y="26" text-anchor="middle" font-size="11" fill="#5B655C">${esc(t.single?(p[6]||'device'):(p[6]||'lands at'))}</text>`;
+  t.screws.forEach((sc,i)=>{const y=44+i*rowH;const lbl=/^[+−]$/.test(sc[0])?ch+' '+sc[0]:sc[0];const land=t.single?(p[5]&&p[5][0])||'':(p[5]&&p[5][i])||'';
+    s+=`<rect x="16" y="${y-11}" width="96" height="22" rx="3" fill="#fff" stroke="#CFD6D0"/><text x="64" y="${y+4}" text-anchor="middle" font-size="12" font-weight="700" fill="#111512">${esc(lbl)}</text>`;
+        s+=`<line x1="112" y1="${y}" x2="${W-120}" y2="${y}" stroke="#111512" stroke-width="2.5" stroke-linecap="round"/>`;
+    s+=`<text x="${W/2}" y="${y-7}" text-anchor="middle" font-size="10" fill="#5B655C">${esc(sc[2])}</text>`;
+    if(sc[1]==='feed')s+=`<text x="${W/2}" y="${y+16}" text-anchor="middle" font-size="10" font-weight="700" fill="#7A5300">supply →</text>`;
+    if(sc[1]==='sw')s+=`<text x="${W/2}" y="${y+16}" text-anchor="middle" font-size="10" font-weight="700" fill="#7A5300">→ to load</text>`;
+    s+=`<rect x="${W-112}" y="${y-11}" width="96" height="22" rx="3" fill="#EAEFEA" stroke="#CFD6D0"/><text x="${W-64}" y="${y+4}" text-anchor="middle" font-size="12" font-weight="700" fill="#111512">${esc(land)}</text>`;});
+  if(t.dry&&n===2){s+=`<path d="M 106 ${44+rowH/2-9} l 0 -7 M 106 ${44+rowH/2+9} l 0 7" stroke="#111512" stroke-width="1.5"/><path d="M 106 ${44+rowH/2-9} l 10 14" stroke="#111512" stroke-width="1.5"/><circle cx="106" cy="${44+rowH/2-9}" r="2" fill="#111512"/><circle cx="106" cy="${44+rowH/2+9}" r="2" fill="#111512"/>`}
+  return s+'</svg>';
+}
+function openSheet(r,i){
+  const p=r.pts[i],t=TPL[p[3]]||TPL.TH,ch=p[1];
+  const rows=t.screws.map((sc,j)=>{const lbl=/^[+−]$/.test(sc[0])?ch+' '+sc[0]:sc[0];const land=t.single?(p[5]&&p[5][0])||'':(p[5]&&p[5][j])||'';
+    return `<span class="sc">${esc(lbl)}</span><span class="ld"><b>→ ${esc(land||'at controller')}</b><small>${esc(sc[2])}</small></span>`}).join('');
+  $('#pn').innerHTML=`<div class="grab"></div><h3>${esc(p[2])}</h3><div class="sub">${esc(p[0])} · ${esc(ch)} · ${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}${p[6]?' · '+esc(p[6]):''}</div>
+   ${wiringSVG(p,t,ch)}<div class="wl">${rows}</div>
+   ${t.dry?`<div class="dry"><b>Dry contact — this output supplies no voltage.</b>${t.dry}</div>`:''}
+   ${t.tip?`<div class="tip">${t.tip}</div>`:''}${p[7]?`<div class="tip"><b>Drawing note:</b> ${esc(p[7])}</div>`:''}
+   <button class="close" id="cls">Close</button>`;
+  $('#sheet').classList.add('on');$('#cls').onclick=closeSheet;
+}
+function closeSheet(){$('#sheet').classList.remove('on')}
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
 
 // ---------- boot ----------
 (async()=>{

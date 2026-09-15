@@ -3,28 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1F2A3A">
+<meta name="theme-color" content="#0B5A0F">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="ES2 Tags">
+<meta name="apple-mobile-web-app-title" content="FieldSheet">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>ES2 Equipment Tags</title>
+<title>FieldSheet</title>
 <style>
-:root{--paper:#F5F6F4;--ink:#1F2A3A;--ink2:#5A6675;--rule:#CBD1D8;--strip:#E9ECEF;--alc:#D42B1E;--hi:#FFF2B3;--yel:#E8C21E}
+:root{--paper:#F6F7F4;--ink:#111512;--ink2:#5B655C;--rule:#CFD6D0;--strip:#EAEFEA;--green:#0B5A0F;--green2:#E3EFE4;--hi:#FFF2B3;--yel:#E8C21E}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.35;min-height:100vh}
 button{font:inherit;cursor:pointer}
-.top{background:var(--ink);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;justify-content:space-between}
-.top b{font-size:16px;letter-spacing:.01em}
+.top{background:var(--green);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;justify-content:space-between}
+.top b{font-size:16px;letter-spacing:.01em}.top .lg{background:#fff;color:#111;border-radius:3px;padding:1px 6px;margin-right:8px;font-weight:800;letter-spacing:-.02em}
 .top button{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:99px;padding:5px 12px;font-size:13px}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px 60px}
 /* home */
 .home{padding-top:28px}
 .home h1{font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:-.3px}
 .home p{color:var(--ink2);margin:0 0 22px;max-width:44ch}
-.big{display:block;width:100%;padding:16px;border-radius:10px;border:0;background:var(--ink);color:#fff;font-size:17px;font-weight:600;margin-bottom:10px}
+.big{display:block;width:100%;padding:16px;border-radius:10px;border:0;background:var(--green);color:#fff;font-size:17px;font-weight:600;margin-bottom:10px}
 .sec{display:block;width:100%;padding:13px;border-radius:10px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);font-size:15px;margin-bottom:10px}
 details{margin-top:18px;border-top:1px solid var(--rule);padding-top:12px}
 summary{cursor:pointer;color:var(--ink2);font-size:14px}
@@ -39,7 +39,7 @@ textarea{width:100%;min-height:110px;font:13px/1.4 ui-monospace,Menlo,monospace;
 .scan .bar button{background:#fff;color:#000;border:0;border-radius:99px;padding:9px 18px;font-weight:600}
 .reticle{position:absolute;left:50%;top:45%;width:min(70vw,320px);aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none}
 /* record */
-.hd{padding:18px 0 12px;border-bottom:3px solid var(--ink)}
+.hd{padding:18px 0 12px;border-bottom:3px solid var(--green)}
 .hd .u{font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1.05}
 .hd .t{font-size:17px;font-weight:600;margin-top:2px}
 .hd .m{color:var(--ink2);font-size:13px;margin-top:6px}
@@ -47,14 +47,14 @@ textarea{width:100%;min-height:110px;font:13px/1.4 ui-monospace,Menlo,monospace;
 .warn{font-size:12.5px;color:#7A5300;background:var(--hi);border-radius:6px;padding:6px 10px;margin-top:10px;display:inline-block}
 .search{position:sticky;top:0;z-index:5;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--rule)}
 .search input{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1.5px solid var(--ink);border-radius:8px;background:#fff;color:var(--ink)}
-.search input:focus{outline:3px solid var(--hi);outline-offset:0}
+.search input:focus{outline:3px solid #9CC79F;outline-offset:0}
 .hint{font-size:12px;color:var(--ink2);margin-top:5px;min-height:15px}
 h2{font-size:13px;font-weight:600;color:var(--ink2);margin:22px 0 10px}
 h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 .ctl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ctl>div{border:1.5px solid var(--ink);border-radius:8px;background:#fff;padding:10px 12px}
 .ctl .tag{font-weight:700;font-size:17px}
-.ctl .mdl{color:var(--alc);font-weight:700;font-size:13px}
+.ctl .mdl{color:var(--green);font-weight:700;font-size:13px}
 .ctl dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13px}
 .ctl dt{color:var(--ink2)}.ctl dd{margin:0;font-weight:600}
 .ctl dd.na{color:var(--ink2);font-weight:400;font-style:italic}
@@ -62,8 +62,8 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 .dev .h{display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;border-bottom:1.5px solid var(--ink)}
 .dev .h .tag{font-weight:700;font-size:17px}
 .dev .h .mdl{color:var(--ink2);font-size:13px}
-.dev .h .mdl b{color:var(--alc)}
-.grp{padding:5px 12px;font-size:12px;color:var(--ink2);background:var(--strip);border-bottom:1px solid var(--rule)}
+.dev .h .mdl b{color:var(--green)}
+.grp{padding:5px 12px;font-size:12px;color:var(--green);font-weight:600;background:var(--green2);border-bottom:1px solid var(--rule)}
 .pt{display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--rule)}
 .pt:last-child{border-bottom:0}
 .pt .ch{font-weight:700;font-size:13px;background:var(--strip);border-radius:3px;padding:3px 0;text-align:center;border:1px solid var(--rule)}
@@ -78,7 +78,7 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 </style>
 </head>
 <body>
-<div class="top"><b>ES2 Equipment Tags</b><button id="home" hidden>Scan another</button></div>
+<div class="top"><b><span class="lg">es2</span> FieldSheet</b><button id="home" hidden>Scan another</button></div>
 
 <div class="wrap" id="app"></div>
 

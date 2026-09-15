@@ -9,7 +9,7 @@ Offline QR tags for HVAC equipment: the QR carries the unit's controllers, netwo
 
 ## Publish
 1. Push this repo to GitHub.
-2. Settings → Pages → Deploy from branch → `main`, folder `/tags` (or move `tags/` contents to root / `docs`).
+2. Settings → Pages → Deploy from branch → `main`, folder `/tags` (or move `docs/` contents to root / `docs`).
 3. Your app URL is `https://<org>.github.io/<repo>/`. Put that in `tools/make_tag.py` (`DEFAULT_BASE`) so labels point at it.
 
 ## Make a label

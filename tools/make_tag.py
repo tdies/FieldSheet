@@ -11,7 +11,7 @@ import argparse, base64, json, sys, zlib
 import qrcode
 from PIL import Image, ImageDraw, ImageFont
 
-DEFAULT_BASE = "https://YOURORG.github.io/tags/"
+DEFAULT_BASE = "https://tdies.github.io/FieldSheet/"
 
 def payload(rec: dict, raw: bool) -> str:
     s = json.dumps(rec, separators=(",", ":")).encode()

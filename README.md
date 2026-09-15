@@ -3,7 +3,7 @@
 Offline QR tags for HVAC equipment: the QR carries the unit's controllers, network IDs, and point-to-terminal list. The app (a PWA) renders it. No job data is ever hosted — only the renderer.
 
 ## Layout
-- `tags/` — the app. Publish this folder with GitHub Pages.
+- `docs/` — the app. Publish this folder with GitHub Pages.
 - `tools/make_tag.py` — JSON → printable QR label PNG.
 - `samples/` — AHU-34 record and generated labels.
 
@@ -24,7 +24,7 @@ Compressed AHU-34 = QR version 23 (109 modules). Print at ≥ 0.5 mm/module → 
 - **Open sample tag** button on the home screen.
 - **Paste** — the textarea accepts the full URL, the `#...` payload, or raw JSON.
 - Display `samples/AHU-34_tag.png` on a laptop screen and scan it with a phone (requires the app to be hosted over https; camera won't open from a local file).
-- Locally: `cd tags && python3 -m http.server 8000`, open `http://localhost:8000` on the same machine (camera works on localhost).
+- Locally: `cd docs && python3 -m http.server 8000`, open `http://localhost:8000` on the same machine (camera works on localhost).
 
 ## Tag format
 `<base>#<payload>`. Payload prefix `z` = zlib + base64url of minified JSON; `j` = plain JSON.

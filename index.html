@@ -36,7 +36,7 @@ textarea{width:100%;min-height:110px;font:13px/1.4 ui-monospace,Menlo,monospace;
 .scan{position:fixed;inset:0;background:#000;z-index:20;display:none;flex-direction:column}
 .scan video{flex:1;width:100%;object-fit:cover}
 .scan .bar{padding:14px 16px calc(env(safe-area-inset-bottom) + 14px);display:flex;justify-content:space-between;align-items:center;color:#fff;background:#000}
-.scan .bar button{background:#fff;color:#000;border:0;border-radius:99px;padding:9px 18px;font-weight:600}
+.scan .bar button{background:#fff;color:#000;border:0;border-radius:99px;padding:9px 14px;font-weight:600;font-size:14px}
 .reticle{position:absolute;left:50%;top:45%;width:min(70vw,320px);aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none}
 /* record */
 .hd{padding:18px 0 12px;border-bottom:3px solid var(--green)}
@@ -99,7 +99,8 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 
 <div class="sheet" id="sheet"><div class="pn" id="pn"></div></div>
 <div class="scan" id="scan"><video id="vid" playsinline muted></video><div class="reticle"></div>
-<div class="bar"><span id="scanmsg">Point at a tag</span><button id="stop">Cancel</button></div></div>
+<div class="bar"><span id="scanmsg">Point at a tag</span><span><button id="takepic" style="margin-right:8px">Take photo</button><button id="stop">Cancel</button></span></div></div>
+<input type="file" id="pic" accept="image/*" capture="environment" hidden>
 
 <script src="jsqr.js"></script>
 <script>
@@ -147,6 +148,7 @@ function home(){
   <h1>Scan an equipment tag</h1>
   <p>Wiring and network reference for the unit you're standing at. Works offline once this page has loaded.</p>
   <button class="big" id="b-scan">Scan tag</button>
+  <button class="sec" id="b-pic">Take a photo of a tag</button>
   <button class="sec" id="b-sample">Open sample tag (AHU-34)</button>
   <div class="err" id="err"></div>
   <details><summary>Paste a tag payload or JSON</summary>
@@ -156,35 +158,48 @@ function home(){
   </div>`;
   $('#b-scan').onclick=startScan;
   $('#b-sample').onclick=()=>show(SAMPLE);
+  $('#b-pic').onclick=()=>$('#pic').click();
   $('#b-paste').onclick=async()=>{try{show(await decodePayload($('#paste').value))}catch(e){err(e.message)}};
 }
 function err(m){const e=$('#err');if(e){e.textContent=m;e.style.display='block'}else alert(m)}
+function errSafe(m){if(!$('#err'))home();err(m)}
 
 // ---------- scanner ----------
-let stream,raf;
+let stream,raf,frames=0;
+function decodeImageData(img){const q=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});return q?q.data:null}
 async function startScan(){
   const sc=$('#scan'),v=$('#vid'),msg=$('#scanmsg');
-  sc.style.display='flex'; msg.textContent='Point at a tag';
-  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1280}}});}
-  catch(e){sc.style.display='none';err('Camera unavailable: '+e.message+(location.protocol==='file:'?' — camera needs https (or use Paste / the sample tag to test).':''));return}
-  v.srcObject=stream; await v.play();
+  sc.style.display='flex'; msg.textContent='Starting camera…'; frames=0;
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:960}},audio:false});}
+  catch(e){msg.textContent='Camera blocked: '+e.name+'. Use "Take photo" below.';return}
+  v.srcObject=stream; v.setAttribute('autoplay',''); v.setAttribute('playsinline',''); v.muted=true;
+  try{await v.play()}catch(e){msg.textContent='Preview failed: '+e.name+'. Use "Take photo" below.';return}
   const det=('BarcodeDetector' in window)?new BarcodeDetector({formats:['qr_code']}):null;
   const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
+  let busy=false;
   const loop=async()=>{
     if(!stream) return;
-    let text=null;
-    if(v.readyState>=2){
-      if(det){try{const r=await det.detect(v);if(r[0])text=r[0].rawValue}catch{}}
-      else{cv.width=v.videoWidth;cv.height=v.videoHeight;cx.drawImage(v,0,0);
-        const img=cx.getImageData(0,0,cv.width,cv.height);const q=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});if(q)text=q.data}
-    }
-    if(text){msg.textContent='Reading…';try{const rec=await decodePayload(text);stopScan();show(rec);return}catch(e){msg.textContent=e.message}}
+    if(!busy&&v.readyState>=2&&v.videoWidth){busy=true;frames++;let text=null;
+      if(det){try{const r=await det.detect(v);if(r&&r[0])text=r[0].rawValue}catch{}}
+      if(!text){const s=Math.min(1,800/Math.max(v.videoWidth,v.videoHeight));cv.width=v.videoWidth*s|0;cv.height=v.videoHeight*s|0;cx.drawImage(v,0,0,cv.width,cv.height);text=decodeImageData(cx.getImageData(0,0,cv.width,cv.height))}
+      if(text){msg.textContent='Reading…';try{const rec=await decodePayload(text);stopScan();show(rec);return}catch(e){msg.textContent=e.message}}
+      else if(frames%15===0)msg.textContent=`Point at a tag (${frames} frames)`;
+      busy=false}
     raf=requestAnimationFrame(loop);
   };
   loop();
 }
-function stopScan(){cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('#scan').style.display='none'}
+function stopScan(){cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}const v=$('#vid');v.pause();v.srcObject=null;$('#scan').style.display='none'}
 $('#stop').onclick=stopScan;
+// photo fallback — uses the phone's own camera app, no getUserMedia needed
+$('#pic').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';
+  try{const bmp=await createImageBitmap(f);const s=Math.min(1,1600/Math.max(bmp.width,bmp.height));const cv=document.createElement('canvas');cv.width=bmp.width*s|0;cv.height=bmp.height*s|0;const cx=cv.getContext('2d');cx.drawImage(bmp,0,0,cv.width,cv.height);
+    let text=decodeImageData(cx.getImageData(0,0,cv.width,cv.height));
+    if(!text){const cv2=document.createElement('canvas');cv2.width=cv.width/2|0;cv2.height=cv.height/2|0;cv2.getContext('2d').drawImage(cv,0,0,cv2.width,cv2.height);text=decodeImageData(cv2.getContext('2d').getImageData(0,0,cv2.width,cv2.height))}
+    if(!text)throw new Error('No QR code found in that photo. Fill the frame with the code and try again.');
+    stopScan();show(await decodePayload(text))}
+  catch(ex){stopScan();errSafe(ex.message)}});
+$('#takepic').onclick=()=>$('#pic').click();
 
 // ---------- render ----------
 function show(r){

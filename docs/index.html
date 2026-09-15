@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1F2A3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="ES2 Tags">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>ES2 Equipment Tags</title>
+<style>
+:root{--paper:#F5F6F4;--ink:#1F2A3A;--ink2:#5A6675;--rule:#CBD1D8;--strip:#E9ECEF;--alc:#D42B1E;--hi:#FFF2B3;--yel:#E8C21E}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.35;min-height:100vh}
+button{font:inherit;cursor:pointer}
+.top{background:var(--ink);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;justify-content:space-between}
+.top b{font-size:16px;letter-spacing:.01em}
+.top button{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:99px;padding:5px 12px;font-size:13px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 60px}
+/* home */
+.home{padding-top:28px}
+.home h1{font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:-.3px}
+.home p{color:var(--ink2);margin:0 0 22px;max-width:44ch}
+.big{display:block;width:100%;padding:16px;border-radius:10px;border:0;background:var(--ink);color:#fff;font-size:17px;font-weight:600;margin-bottom:10px}
+.sec{display:block;width:100%;padding:13px;border-radius:10px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);font-size:15px;margin-bottom:10px}
+details{margin-top:18px;border-top:1px solid var(--rule);padding-top:12px}
+summary{cursor:pointer;color:var(--ink2);font-size:14px}
+textarea{width:100%;min-height:110px;font:13px/1.4 ui-monospace,Menlo,monospace;border:1.5px solid var(--rule);border-radius:8px;padding:8px;margin:10px 0 8px;background:#fff}
+.err{background:#FBE9E7;border:1px solid #E5A79F;color:#7A1F14;border-radius:8px;padding:10px 12px;margin:12px 0;font-size:14px;display:none}
+.install{background:#fff;border:1.5px solid var(--rule);border-radius:10px;padding:12px;font-size:13.5px;color:var(--ink2);margin-top:18px}
+.install b{color:var(--ink)}
+/* scanner */
+.scan{position:fixed;inset:0;background:#000;z-index:20;display:none;flex-direction:column}
+.scan video{flex:1;width:100%;object-fit:cover}
+.scan .bar{padding:14px 16px calc(env(safe-area-inset-bottom) + 14px);display:flex;justify-content:space-between;align-items:center;color:#fff;background:#000}
+.scan .bar button{background:#fff;color:#000;border:0;border-radius:99px;padding:9px 18px;font-weight:600}
+.reticle{position:absolute;left:50%;top:45%;width:min(70vw,320px);aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none}
+/* record */
+.hd{padding:18px 0 12px;border-bottom:3px solid var(--ink)}
+.hd .u{font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1.05}
+.hd .t{font-size:17px;font-weight:600;margin-top:2px}
+.hd .m{color:var(--ink2);font-size:13px;margin-top:6px}
+.hd .m b{color:var(--ink);font-weight:600}
+.warn{font-size:12.5px;color:#7A5300;background:var(--hi);border-radius:6px;padding:6px 10px;margin-top:10px;display:inline-block}
+.search{position:sticky;top:0;z-index:5;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--rule)}
+.search input{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:1.5px solid var(--ink);border-radius:8px;background:#fff;color:var(--ink)}
+.search input:focus{outline:3px solid var(--hi);outline-offset:0}
+.hint{font-size:12px;color:var(--ink2);margin-top:5px;min-height:15px}
+h2{font-size:13px;font-weight:600;color:var(--ink2);margin:22px 0 10px}
+h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
+.ctl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ctl>div{border:1.5px solid var(--ink);border-radius:8px;background:#fff;padding:10px 12px}
+.ctl .tag{font-weight:700;font-size:17px}
+.ctl .mdl{color:var(--alc);font-weight:700;font-size:13px}
+.ctl dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13px}
+.ctl dt{color:var(--ink2)}.ctl dd{margin:0;font-weight:600}
+.ctl dd.na{color:var(--ink2);font-weight:400;font-style:italic}
+.dev{border:1.5px solid var(--ink);border-radius:8px;background:#fff;margin:0 0 14px;overflow:hidden}
+.dev .h{display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;border-bottom:1.5px solid var(--ink)}
+.dev .h .tag{font-weight:700;font-size:17px}
+.dev .h .mdl{color:var(--ink2);font-size:13px}
+.dev .h .mdl b{color:var(--alc)}
+.grp{padding:5px 12px;font-size:12px;color:var(--ink2);background:var(--strip);border-bottom:1px solid var(--rule)}
+.pt{display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--rule)}
+.pt:last-child{border-bottom:0}
+.pt .ch{font-weight:700;font-size:13px;background:var(--strip);border-radius:3px;padding:3px 0;text-align:center;border:1px solid var(--rule)}
+.pt .n{font-weight:500;line-height:1.2}
+.pt .n small{display:block;color:var(--ink2);font-size:12px;margin-top:2px}
+.pt .r{text-align:right;font-size:12.5px;line-height:1.3}
+.pt .r b{display:block;font-size:14px}
+.hit{background:var(--hi)!important;box-shadow:inset 0 0 0 2px var(--yel)}
+.dim{opacity:.25}
+.foot{margin-top:28px;font-size:12px;color:var(--ink2);text-align:center}
+@media(min-width:640px){.ctl{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="top"><b>ES2 Equipment Tags</b><button id="home" hidden>Scan another</button></div>
+
+<div class="wrap" id="app"></div>
+
+<div class="scan" id="scan"><video id="vid" playsinline muted></video><div class="reticle"></div>
+<div class="bar"><span id="scanmsg">Point at a tag</span><button id="stop">Cancel</button></div></div>
+
+<script src="jsqr.js"></script>
+<script>
+// ---------- sample tag (AHU-34, sheet 1.11) ----------
+const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101","T3-4"],["ALC-35","UI-02","Space Pressure","mA","C-102","T5-6"],["ALC-35","UI-05","Supply Air Temp","TH","C-105","T11-12"],["ALC-35","UI-06","Return Air Temp","TH","C-106","T13-14"],["ALC-35","UI-07","Return Air Hum","mA","C-107","T15-16"],["ALC-35","UI-09","Mixed Air Temp","TH","C-109","T19-20"],["ALC-35","UI-11","Filters Diff Pressure","V","C-111","T23-24"],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112","T25-26"],["ALC-35","UO-01","CHW Valve","V","C-121","T29-30"],["ALC-35","UO-02","Gas Valve Enable","DO","C-122","T31-32"],["ALC-35","UO-03","Gas Valve Signal","V","C-123","T33-34"],["ALC-35","UO-04","Economizer Dampers","V","C-124","T35-36"],["ALC-35","UO-05","Exhaust Air Damper","V","C-125","T37-38"],["ALC-36","UI-01","Supply Fan Status","DI","C-201","T41-42"],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202","T43-44"],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205","T49-50"],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206","T51-52"],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221","T67-68"],["ALC-36","UO-02","Supply Fan Speed","V","C-222","T69-70"],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223","T71-72"],["ALC-36","UO-04","Exhaust Fan Speed","V","C-224","T73-74"]]};
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const TYPES={TH:'thermistor',mA:'4–20 mA',V:'0–10 V',DI:'dry contact',DO:'relay'};
+const ROLES={bc:'Building controller',exp:'I/O expander',zn:'Zone controller'};
+
+// ---------- payload decode ----------
+async function decodePayload(str){
+  str=str.trim();
+  const h=str.indexOf('#'); if(h>=0) str=str.slice(h+1);
+  if(str.startsWith('j')) return JSON.parse(str.slice(1));
+  if(str.startsWith('z')){
+    if(!('DecompressionStream' in window)) throw new Error('This browser cannot inflate compressed tags. Update iOS/Android or use an uncompressed tag.');
+    let b64=str.slice(1).replace(/-/g,'+').replace(/_/g,'/'); while(b64.length%4) b64+='=';
+    const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    const ds=new DecompressionStream('deflate');
+    const w=ds.writable.getWriter(); w.write(bytes); w.close();
+    const txt=await new Response(ds.readable).text();
+    return JSON.parse(txt);
+  }
+  if(str.startsWith('{')) return JSON.parse(str);   // pasted raw JSON
+  throw new Error('Not an ES2 tag.');
+}
+
+// ---------- home ----------
+function home(){
+  $('#home').hidden=true; location.hash='';
+  $('#app').innerHTML=`<div class="home">
+  <h1>Scan an equipment tag</h1>
+  <p>Wiring and network reference for the unit you're standing at. Works offline once this page has loaded.</p>
+  <button class="big" id="b-scan">Scan tag</button>
+  <button class="sec" id="b-sample">Open sample tag (AHU-34)</button>
+  <div class="err" id="err"></div>
+  <details><summary>Paste a tag payload or JSON</summary>
+   <textarea id="paste" placeholder="Paste the full tag URL, the part after #, or the raw JSON"></textarea>
+   <button class="sec" id="b-paste">Open</button></details>
+  <div class="install"><b>Install:</b> iPhone — Share → Add to Home Screen. Android — menu → Install app. After that the stock camera opens tags here, offline.</div>
+  </div>`;
+  $('#b-scan').onclick=startScan;
+  $('#b-sample').onclick=()=>show(SAMPLE);
+  $('#b-paste').onclick=async()=>{try{show(await decodePayload($('#paste').value))}catch(e){err(e.message)}};
+}
+function err(m){const e=$('#err');if(e){e.textContent=m;e.style.display='block'}else alert(m)}
+
+// ---------- scanner ----------
+let stream,raf;
+async function startScan(){
+  const sc=$('#scan'),v=$('#vid'),msg=$('#scanmsg');
+  sc.style.display='flex'; msg.textContent='Point at a tag';
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1280}}});}
+  catch(e){sc.style.display='none';err('Camera unavailable: '+e.message+(location.protocol==='file:'?' — camera needs https (or use Paste / the sample tag to test).':''));return}
+  v.srcObject=stream; await v.play();
+  const det=('BarcodeDetector' in window)?new BarcodeDetector({formats:['qr_code']}):null;
+  const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
+  const loop=async()=>{
+    if(!stream) return;
+    let text=null;
+    if(v.readyState>=2){
+      if(det){try{const r=await det.detect(v);if(r[0])text=r[0].rawValue}catch{}}
+      else{cv.width=v.videoWidth;cv.height=v.videoHeight;cx.drawImage(v,0,0);
+        const img=cx.getImageData(0,0,cv.width,cv.height);const q=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});if(q)text=q.data}
+    }
+    if(text){msg.textContent='Reading…';try{const rec=await decodePayload(text);stopScan();show(rec);return}catch(e){msg.textContent=e.message}}
+    raf=requestAnimationFrame(loop);
+  };
+  loop();
+}
+function stopScan(){cancelAnimationFrame(raf);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('#scan').style.display='none'}
+$('#stop').onclick=stopScan;
+
+// ---------- render ----------
+function show(r){
+  $('#home').hidden=false;
+  const ctlBy=Object.fromEntries((r.ctl||[]).map(c=>[c.tag,c]));
+  const byCtl={}; (r.pts||[]).forEach(p=>(byCtl[p[0]]??=[]).push(p));
+  const ctls=(r.ctl||[]).map(c=>{
+    const rows=[];
+    if(c.role) rows.push(['Role',ROLES[c.role]||c.role]);
+    if(c.role==='bc'||'di' in c) rows.push(['Device instance',c.di]);
+    if('mac' in c) rows.push(['MAC',c.mac]);
+    if(c.net) rows.push(['Network',c.net]);
+    if('ip' in c) rows.push(['IP',c.ip]);
+    if(c.exp!=null) rows.push(['Expander ID',c.exp]);
+    return `<div class="s" data-k="${esc(c.tag+' '+c.mdl+' '+(c.di??'')+' '+(c.mac??'')+' '+(c.ip??''))}"><div class="tag">${esc(c.tag)}</div><div class="mdl">${esc(c.mdl)}</div>
+      <dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd class="${v==null||v===''?'na':''}">${v==null||v===''?'not set':esc(v)}</dd>`).join('')}</dl></div>`}).join('');
+  const devs=Object.entries(byCtl).map(([tag,pts])=>{
+    const c=ctlBy[tag]||{};
+    const row=p=>`<div class="pt s" data-k="${esc(p.join(' ')+' '+(TYPES[p[3]]||''))}"><span class="ch">${esc(p[1])}</span><span class="n">${esc(p[2])}<small>${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}</small></span><span class="r"><b>${esc(p[5]||'')}</b></span></div>`;
+    const ui=pts.filter(p=>/^UI/.test(p[1])),uo=pts.filter(p=>/^UO/.test(p[1])),other=pts.filter(p=>!/^U[IO]/.test(p[1]));
+    return `<div class="dev"><div class="h"><span class="tag">${esc(tag)}</span><span class="mdl"><b>${esc(c.mdl||'')}</b>${c.exp!=null?' · Expander '+c.exp:''}</span></div>
+      ${ui.length?'<div class="grp">Inputs</div>'+ui.map(row).join(''):''}${uo.length?'<div class="grp">Outputs</div>'+uo.map(row).join(''):''}${other.length?'<div class="grp">Points</div>'+other.map(row).join(''):''}</div>`}).join('');
+  $('#app').innerHTML=`
+  <div class="hd"><div class="u">${esc(r.unit)}</div><div class="t">${esc(r.typ||'')}</div>
+   <div class="m">Job <b>${esc(r.job||'—')}</b> · sheets <b>${esc((r.sh||[]).join(', '))}</b> · rev <b>${esc(r.rev||'—')}</b></div>
+   ${r.asb?`<div class="m">As-built <b>${esc(r.asb)}</b></div>`:`<div class="warn">No as-built date — generated from submittal, not verified in field</div>`}</div>
+  <div class="search"><input id="q" type="search" placeholder="Find a point, channel, cable, terminal…" autocomplete="off"><div class="hint" id="hint"></div></div>
+  <h2>Network<span>Controllers</span></h2><div class="ctl">${ctls}</div>
+  <h2>Channel · point · cable · terminals<span>Points</span></h2>${devs}
+  <div class="foot">Tag format v${esc(r.v||1)} · ${(r.pts||[]).length} points</div>`;
+  const items=[...document.querySelectorAll('.s')];
+  $('#q').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();let n=0;
+    items.forEach(el=>{const hit=q&&el.dataset.k.toLowerCase().includes(q);el.classList.toggle('hit',hit);el.classList.toggle('dim',!!q&&!hit);if(hit)n++});
+    $('#hint').textContent=q?(n?`${n} match${n>1?'es':''}`:'No matches'):'';
+    if(q&&n){const f=items.find(el=>el.classList.contains('hit'));f&&f.scrollIntoView({block:'center'})}});
+  window.scrollTo(0,0);
+}
+$('#home').onclick=home;
+
+// ---------- boot ----------
+(async()=>{
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if(location.hash.length>1){try{show(await decodePayload(location.hash));return}catch(e){home();err(e.message);return}}
+  home();
+})();
+addEventListener('hashchange',async()=>{if(location.hash.length>1){try{show(await decodePayload(location.hash))}catch(e){home();err(e.message)}}});
+</script>
+</body>
+</html>

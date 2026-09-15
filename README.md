@@ -28,5 +28,6 @@ Compressed AHU-34 = QR version 23 (109 modules). Print at ≥ 0.5 mm/module → 
 
 ## Tag format
 `<base>#<payload>`. Payload prefix `z` = zlib + base64url of minified JSON; `j` = plain JSON.
-Record: `v, unit, typ, job, sh[], rev, asb, ctl[{tag, mdl, role, di, mac, net, ip, exp}], pts[[controller, channel, name, type, cable, terminals, field device (optional)]]`.
-Types: TH, mA, V, DI, DO, RNET, PWR. Terminals may be a strip pair (T11-12) or a unit terminal (G, Y1); empty = landed at controller. Fields `asb`, `di`, `ip` are filled at checkout.
+Record: `v, unit, typ, job, sh[], rev, asb, ctl[{tag, mdl, role, di, mac, net, ip, exp}], pts[[controller, channel, name, type, cable, wires, field device?, note?]]`.
+Wires: one row per conductor `[controller screw, lands at, color, role]`; role is `sig`, `ret`, `pwr` (loop power), `feed` (supply into a dry contact), `sw` (switched leg out to load), or `net`. `DO` points render a dry-contact callout automatically.
+Types: TH, mA, V, DI, DO, RNET, PWR.

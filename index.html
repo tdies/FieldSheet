@@ -71,6 +71,19 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 .pt .n small{display:block;color:var(--ink2);font-size:12px;margin-top:2px}
 .pt .r{text-align:right;font-size:12.5px;line-height:1.3}
 .pt .r b{display:block;font-size:14px}
+.pt{grid-template-columns:54px 1fr;align-items:start}
+.pt .n{padding-top:3px}
+.cond{grid-column:1/-1;margin-top:6px;border-top:1px dashed var(--rule);padding-top:6px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;font-size:13px;align-items:center}
+.cond .sc{font-weight:700;background:var(--strip);border:1px solid var(--rule);border-radius:3px;padding:2px 6px;white-space:nowrap}
+.cond .ld{white-space:nowrap}.cond .ld b{font-weight:600}
+.cond .ld small{color:var(--ink2);font-size:11.5px;display:block}
+.w{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;justify-self:end}
+.w i{width:16px;height:9px;border-radius:2px;border:1px solid #8892a0;display:inline-block}
+.w.RED i{background:#C8202A;border-color:#C8202A}.w.BLK i{background:#1B1B1B;border-color:#1B1B1B}.w.WHT i{background:#fff}.w.YEL i{background:#E8C21E;border-color:#E8C21E}.w.GRN i{background:#1E8A3B;border-color:#1E8A3B}.w.BLU i{background:#2456B8;border-color:#2456B8}.w.ORG i{background:#E8791E;border-color:#E8791E}.w.BRN i{background:#6B3E1E;border-color:#6B3E1E}
+.dry{grid-column:1/-1;font-size:12.5px;background:#FFF2B3;border-left:3px solid #C99A00;padding:6px 9px;border-radius:0 6px 6px 0;margin-top:4px;line-height:1.35}
+.dry>b:first-child{display:block;margin-bottom:2px}
+.note{grid-column:1/-1;font-size:12.5px;color:var(--ink2);margin-top:4px}
+.arrow{color:var(--ink2);font-size:12px}
 .hit{background:var(--hi)!important;box-shadow:inset 0 0 0 2px var(--yel)}
 .dim{opacity:.25}
 .foot{margin-top:28px;font-size:12px;color:var(--ink2);text-align:center}
@@ -88,7 +101,7 @@ h2 span{color:var(--ink);font-size:18px;font-weight:700;display:block}
 <script src="jsqr.js"></script>
 <script>
 // ---------- sample tag (AHU-34, sheet 1.11) ----------
-const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101","T3-4"],["ALC-35","UI-02","Space Pressure","mA","C-102","T5-6"],["ALC-35","UI-05","Supply Air Temp","TH","C-105","T11-12"],["ALC-35","UI-06","Return Air Temp","TH","C-106","T13-14"],["ALC-35","UI-07","Return Air Hum","mA","C-107","T15-16"],["ALC-35","UI-09","Mixed Air Temp","TH","C-109","T19-20"],["ALC-35","UI-11","Filters Diff Pressure","V","C-111","T23-24"],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112","T25-26"],["ALC-35","UO-01","CHW Valve","V","C-121","T29-30"],["ALC-35","UO-02","Gas Valve Enable","DO","C-122","T31-32"],["ALC-35","UO-03","Gas Valve Signal","V","C-123","T33-34"],["ALC-35","UO-04","Economizer Dampers","V","C-124","T35-36"],["ALC-35","UO-05","Exhaust Air Damper","V","C-125","T37-38"],["ALC-36","UI-01","Supply Fan Status","DI","C-201","T41-42"],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202","T43-44"],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205","T49-50"],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206","T51-52"],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221","T67-68"],["ALC-36","UO-02","Supply Fan Speed","V","C-222","T69-70"],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223","T71-72"],["ALC-36","UO-04","Exhaust Fan Speed","V","C-224","T73-74"]]};
+const SAMPLE={"v":1,"unit":"AHU-34","typ":"CAV AHU","job":"03-24018B","sh":["1.10","1.11","1.12"],"rev":"3","asb":null,"ctl":[{"tag":"ALC-34","mdl":"OFBBC-NR","role":"bc","di":null,"mac":"A","net":"ARCNET","ip":null},{"tag":"ALC-35","mdl":"FIO812u","role":"exp","exp":1},{"tag":"ALC-36","mdl":"FIO812u","role":"exp","exp":2}],"pts":[["ALC-35","UI-01","Space Temp","TH","C-101",[["UI-01 +","T3","WHT","sig"],["UI-01 \u2212","T4","RED","ret"]]],["ALC-35","UI-02","Space Pressure","mA","C-102",[["24Vdc +","T6","RED","pwr"],["UI-02 +","T5","WHT","sig"]]],["ALC-35","UI-05","Supply Air Temp","TH","C-105",[["UI-05 +","T11","WHT","sig"],["UI-05 \u2212","T12","BLK","ret"]]],["ALC-35","UI-06","Return Air Temp","TH","C-106",[["UI-06 +","T13","WHT","sig"],["UI-06 \u2212","T14","BLK","ret"]]],["ALC-35","UI-07","Return Air Hum","mA","C-107",[["24Vdc +","T16","RED","pwr"],["UI-07 +","T15","WHT","sig"]]],["ALC-35","UI-09","Mixed Air Temp","TH","C-109",[["UI-09 +","T19","WHT","sig"],["UI-09 \u2212","T20","BLK","ret"]]],["ALC-35","UI-11","Filters Diff Pressure","V","C-111",[["UI-11 +","T23","WHT","sig"],["UI-11 \u2212","T24","BLK","ret"]]],["ALC-35","UI-12","Leaving Coil Temp","TH","C-112",[["UI-12 +","T25","WHT","sig"],["UI-12 \u2212","T26","BLK","ret"]]],["ALC-35","UO-01","CHW Valve","V","C-121",[["UO-01 +","T29","WHT","sig"],["UO-01 \u2212","T30","BLK","ret"]]],["ALC-35","UO-02","Gas Valve Enable","DO","C-122",[["UO-02 +","T27 (24V)","WHT","feed"],["UO-02 \u2212","CR-34 coil","BLK","sw"]]],["ALC-35","UO-03","Gas Valve Signal","V","C-123",[["UO-03 +","T33","WHT","sig"],["UO-03 \u2212","T34","BLK","ret"]]],["ALC-35","UO-04","Economizer Dampers","V","C-124",[["UO-04 +","T35","WHT","sig"],["UO-04 \u2212","T36","BLK","ret"]]],["ALC-35","UO-05","Exhaust Air Damper","V","C-125",[["UO-05 +","T37","WHT","sig"],["UO-05 \u2212","T38","BLK","ret"]]],["ALC-36","UI-01","Supply Fan Status","DI","C-201",[["UI-01 +","T41","WHT","sig"],["UI-01 \u2212","T42","BLK","ret"]]],["ALC-36","UI-02","Supply Fan VFD Fault","DI","C-202",[["UI-02 +","T43","WHT","sig"],["UI-02 \u2212","T44","BLK","ret"]]],["ALC-36","UI-05","Exhaust Fan Status","DI","C-205",[["UI-05 +","T49","WHT","sig"],["UI-05 \u2212","T50","BLK","ret"]]],["ALC-36","UI-06","Exhaust Fan VFD Fault","DI","C-206",[["UI-06 +","T51","WHT","sig"],["UI-06 \u2212","T52","BLK","ret"]]],["ALC-36","UO-01","Supply Fan Start/Stop","DO","C-221",[["UO-01 +","T65 (24V)","WHT","feed"],["UO-01 \u2212","CR-27 coil","BLK","sw"]]],["ALC-36","UO-02","Supply Fan Speed","V","C-222",[["UO-02 +","T69","WHT","sig"],["UO-02 \u2212","T70","BLK","ret"]]],["ALC-36","UO-03","Exhaust Fan Start/Stop","DO","C-223",[["UO-03 +","T65 (24V)","WHT","feed"],["UO-03 \u2212","CR-28 coil","BLK","sw"]]],["ALC-36","UO-04","Exhaust Fan Speed","V","C-224",[["UO-04 +","T73","WHT","sig"],["UO-04 \u2212","T74","BLK","ret"]]]]};
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -176,7 +189,15 @@ function show(r){
       <dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd class="${v==null||v===''?'na':''}">${v==null||v===''?'not set':esc(v)}</dd>`).join('')}</dl></div>`}).join('');
   const devs=Object.entries(byCtl).map(([tag,pts])=>{
     const c=ctlBy[tag]||{};
-    const row=p=>`<div class="pt s" data-k="${esc(p.join(' ')+' '+(TYPES[p[3]]||''))}"><span class="ch">${esc(p[1])}</span><span class="n">${esc(p[2])}<small>${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}${p[6]?' · '+esc(p[6]):''}</small></span><span class="r"><b>${esc(p[5]||'')}</b>${p[5]?'':'<small style="color:var(--ink2)">at ctlr</small>'}</span></div>`;
+    const ROLE={sig:'signal',ret:'return',pwr:'loop power',feed:'supply IN',sw:'switched OUT to load',net:''};
+    const row=p=>{
+      const w=Array.isArray(p[5])?p[5]:[];
+      const key=[p[0],p[1],p[2],p[3],p[4],p[6],...w.flat()].filter(Boolean).join(' ');
+      const conds=w.map(c=>`<span class="sc">${esc(c[0])}</span><span class="ld"><span class="arrow">→ </span><b>${esc(c[1]||'at controller')}</b>${ROLE[c[3]]?`<small>${ROLE[c[3]]}</small>`:''}</span>${c[2]?`<span class="w ${esc(c[2])}"><i></i>${esc(c[2])}</span>`:'<span></span>'}`).join('');
+      const feed=w.find(c=>c[3]==='feed'),sw=w.find(c=>c[3]==='sw');
+      const dry=p[3]==='DO'?`<div class="dry"><b>Dry contact — this output supplies no voltage.</b>${feed?`Bring supply in on <b>${esc(feed[0])}</b>; <b>${esc(sw[0])}</b> switches it out to the load.`:`Contact closes between the screws; the load's supply must come from elsewhere${p[7]?'':' (see drawing)'}.`}</div>`:'';
+      const ma=p[3]==='mA'?`<div class="note">2-wire loop: 24 Vdc + feeds the device, device return lands on the input +. Input − is not used.</div>`:'';
+      return `<div class="pt s" data-k="${esc(key)}"><span class="ch">${esc(p[1])}</span><span class="n">${esc(p[2])}<small>${esc(TYPES[p[3]]||p[3])}${p[4]?' · '+esc(p[4]):''}${p[6]?' · '+esc(p[6]):''}</small></span>${conds?`<div class="cond">${conds}</div>`:''}${dry}${ma}${p[7]?`<div class="note">${esc(p[7])}</div>`:''}</div>`};
     const ui=pts.filter(p=>/^(UI|IN|AI|BI|Rnet)/i.test(p[1])),uo=pts.filter(p=>/^(UO|DO|AO|BO)/i.test(p[1])),other=pts.filter(p=>!ui.includes(p)&&!uo.includes(p));
     return `<div class="dev"><div class="h"><span class="tag">${esc(tag)}</span><span class="mdl"><b>${esc(c.mdl||'')}</b>${c.exp!=null?' · Expander '+c.exp:''}</span></div>
       ${ui.length?'<div class="grp">Inputs</div>'+ui.map(row).join(''):''}${uo.length?'<div class="grp">Outputs</div>'+uo.map(row).join(''):''}${other.length?'<div class="grp">Points</div>'+other.map(row).join(''):''}</div>`}).join('');
@@ -186,7 +207,7 @@ function show(r){
    ${r.asb?`<div class="m">As-built <b>${esc(r.asb)}</b></div>`:`<div class="warn">No as-built date — generated from submittal, not verified in field</div>`}</div>
   <div class="search"><input id="q" type="search" placeholder="Find a point, channel, cable, terminal…" autocomplete="off"><div class="hint" id="hint"></div></div>
   <h2>Network<span>Controllers</span></h2><div class="ctl">${ctls}</div>
-  <h2>Channel · point · cable · terminals<span>Points</span></h2>${devs}
+  <h2>Screw → lands at · wire color<span>Points</span></h2>${devs}
   <div class="foot">Tag format v${esc(r.v||1)} · ${(r.pts||[]).length} points</div>`;
   const items=[...document.querySelectorAll('.s')];
   $('#q').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();let n=0;
